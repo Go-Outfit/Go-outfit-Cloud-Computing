@@ -2,8 +2,10 @@ from flask import Flask, request, jsonify
 import requests
 import dotenv
 import os
+import uuid
 import firebase_admin
 from firebase_admin import credentials, auth
+from firebase_admin import firestore
 
 app = Flask(__name__)
 
@@ -11,18 +13,29 @@ app = Flask(__name__)
 cred = credentials.Certificate("serviceAccountKey.json")
 default_app = firebase_admin.initialize_app(cred)
 
-# Endpoint untuk register
+# Endpoint untuk register dan menyimpan account di firestore
 @app.route('/register', methods=['POST'])
 def register():
-    email = request.json['email']
-    password = request.json['password']
-
+    db = firestore.client()
+    acc = db.collection('account')
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    username = data.get('username')
     try:
         # Membuat user baru dengan Firebase Authentication
         user = auth.create_user(
             email=email,
-            password=password
+            password=password,
         )
+        random_number = str(uuid.uuid4())[:15]
+        account_id = "account-" + random_number
+        acc_data = {
+            'email': email,
+            'password': password,
+            'username': username
+        }
+        acc.document(account_id).set(acc_data)
         return jsonify({'message': 'Registrasi berhasil', 'localId': user.uid})
 
     except Exception as e:
