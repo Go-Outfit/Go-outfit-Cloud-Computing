@@ -31,9 +31,9 @@ def register():
         random_number = str(uuid.uuid4())[:15]
         account_id = "account-" + random_number
         acc_data = {
+            'username': username,
             'email': email,
             'password': password,
-            'username': username
         }
         acc.document(account_id).set(acc_data)
         return jsonify({'message': 'Registrasi berhasil', 'localId': user.uid})
@@ -64,6 +64,7 @@ def login():
 
     except Exception as e:
         return jsonify({'message': 'Login gagal', 'error':str(e)}),401
+ 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=7000)
