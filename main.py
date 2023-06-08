@@ -13,6 +13,11 @@ app = Flask(__name__)
 cred = credentials.Certificate("serviceAccountKey.json")
 default_app = firebase_admin.initialize_app(cred)
 
+# Melakukan tes dari api
+@app.route('/', methods=['GET'])
+def tes():
+    return "Response Berhasil!"
+
 # Endpoint untuk register dan menyimpan account di firestore
 @app.route('/register', methods=['POST'])
 def register():
